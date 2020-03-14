@@ -2,6 +2,7 @@ var admin = require("firebase-admin");
 var database = admin.database();
 var microtime = require("microtime");
 var crypto = require("crypto-js");
+var nJwt = require('njwt');
 
 exports.saveUser = async function (req, res) {
     var id = microtime.now();
@@ -55,15 +56,13 @@ exports.checkExistsAccountByUsername = async function (req, res, next) {
 }
 
 exports.login = async function (req, res) {
-    var rs = await new Promise((resolve, reject) => {
+    await new Promise((resolve, reject) => {
         database.ref('accounts').orderByChild('username').equalTo((req.body.username).toLowerCase()).on('value', function (snapshot) {
             if (snapshot.val() != null || snapshot.val() != undefined) {
                 var obj = snapshot.val();
                 for (var key in obj) {
                     var value = obj[key];
-                    var password = crypto.AES.decrypt(value.password, 'iSilent').toString(crypto.enc.Utf8);
-                    //password is null
-                    console.log("--------------------------------" + password);
+                    var password = crypto.AES.decrypt(value.password, 'ChatBox').toString(crypto.enc.Utf8);
                     if (value.status == 1) {
                         if (req.body.password == password) {
                             var claims = {
@@ -73,32 +72,40 @@ exports.login = async function (req, res) {
                             var jwt = nJwt.create(claims, "secret", "HS256");
                             var token = jwt.compact();
                             resolve({
-                                id: value.id,
-                                token: token,
-                                username: value.username,
-                                fullname: value.fullname,
-                                email: value.email
+                                status: 200,
+                                message: "Login successfully",
+                                data: {
+                                    id: value.id,
+                                    token: token,
+                                    username: value.username,
+                                    fullname: value.fullname,
+                                    email: value.email
+                                }
                             });
                         } else {
                             resolve({
-                                code: 401,
-                                error: 'Tên đăng nhập hoặc mật khẩu không chính xác!'
+                                status: 401,
+                                message: "Username or password incorrect!",
+                                data: null
                             });
                         }
                     } else if (value.status == 0) {
                         resolve({
-                            code: 404,
-                            message: 'Tài khoản không tồn tại'
+                            status: 404,
+                            message: "Account not found!",
+                            data: null
                         });
                     }
                 };
             } else {
                 resolve({
-                    code: 404,
-                    message: 'Tài khoản không tồn tại'
+                    status: 404,
+                    message: "Account not found!",
+                    data: null
                 });
             }
         });
+    }).then((rs) => {
+        res.status(rs.status).json(rs);
     });
-    res.json(rs);
 };

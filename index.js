@@ -21,13 +21,14 @@ var app = express();
 app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+app.use(express.static('./public'));
 
 var userRoute = require('./routes/userRoute')
 userRoute(app);
 
-app.get('/', function(req, res){
-    res.send("Hello World");
+app.get('/', function (req, res) {
+  res.sendFile(path.resolve('./public/index.html'));
 });
-app.listen(process.env.PORT, function(){
-    console.log("Server connect success.");
+app.listen(process.env.PORT, function () {
+  console.log(`Server connect success. PORT ${process.env.PORT}`);
 });
