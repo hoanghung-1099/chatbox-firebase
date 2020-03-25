@@ -1,18 +1,11 @@
-var messageController = require('../controller/messageController');
+var controller = require('../controller/messageController');
 
 module.exports = function(app){
     app.route('/login')
-        .get(controller.getLogin)
         .post(controller.login);
     app.route('/create')
         .get(controller.checkExistsUsername)
         .post(controller.createAccount);
-    app.route('/new')
-        .get(controller.createMessage);
-    app.route('/group')
-        .get(controller.createGrMessage);
-    app.route('/sign')
-        .get(controller.getSign);
     app.route('/sendmsg')
         .post(controller.loginRequired, controller.saveMessage);
     app.route('/avatar/:id')
@@ -20,8 +13,6 @@ module.exports = function(app){
         .post(controller.loginRequired, controller.saveAvt);
     app.route('/info/:id')
         .get(controller.getInfo);
-    app.route('/:mode/:id')
-        .get(controller.getMessage);
     app.route('/list/:mode/:id')
         .get(controller.loginRequired, controller.listMessage);
     app.route('/search/user/:id')
@@ -30,12 +21,6 @@ module.exports = function(app){
         .post(controller.loginRequired, controller.sendMsg);
     app.route('/createMsgGr')
         .post(controller.loginRequired, controller.sendMsgGr);
-    app.route('/about')
-        .get(controller.about);
-    app.route('/download')
-        .get(controller.download);
-    app.route('/setting')
-        .get(controller.setting);
     app.route('/help')
         .get(controller.help);
     app.route('/createMsgGr')
