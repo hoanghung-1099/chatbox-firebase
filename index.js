@@ -29,6 +29,7 @@ userRoute(app);
 app.get('/', function (req, res) {
   res.sendFile(path.resolve('./public/index.html'));
 });
+
 app.listen(process.env.PORT, function () {
   console.log(`Server connect success. PORT ${process.env.PORT}`);
 });
